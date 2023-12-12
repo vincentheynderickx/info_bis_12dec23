@@ -5,10 +5,6 @@ import random
 pygame.init()
 
 
-
-
-    
-screen = pygame.display.set_mode( (width, height) )
 clock = pygame.time.Clock()
 pink = (249,66,158)
 white = (255, 255, 255)
@@ -43,7 +39,7 @@ draw_checkboard()
 
 
 
-def our_snake(snake_block, snake_list):
+def our_snake(snake_size, snake_list):
     for x in snake_list:
         pygame.draw.rect(window, pink, [x[0], x[1], snake_size, snake_size])
 
@@ -72,7 +68,7 @@ def gameLoop():
 
         while game_close == True:
             window.fill(black)
-            our_snake(snake_block, snake_list)
+            our_snake(snake_size, snake_list)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
