@@ -1,73 +1,51 @@
-
 import pygame
 import random
 
 pygame.init()
-
 
 clock = pygame.time.Clock()
 pink = (249,66,158)
 white = (255, 255, 255)
 black = (0, 0, 0)
 
-
-
 square_size = 20
-lines = 15
-columns = 20
-
-
-width = square_size * columns
-height = square_size * lines
+number_lines = 15
+number_columns = 20
+width = square_size * number_columns
+height = square_size * number_lines
 
 window = pygame.display.set_mode((width, height))
 
-
 def draw_checkboard():
-    for line in range(lines):
-        for column in range(columns):
+    for line in range(number_lines):
+        for column in range(number_columns):
             if (line + column) % 2 == 0:
                 color_case = white
             else:
                 color_case = black
             pygame.draw.rect(window, color_case, (column * square_size, line * square_size, square_size, square_size))
 
-
 draw_checkboard()
 
-
-
-
-def our_snake(snake_size, snake_list):
-    for x in snake_list:
+def our_snake(snake_size, snake_positions):
+    for x in snake_positions:
         pygame.draw.rect(window, pink, [x[0], x[1], snake_size, snake_size])
-
-
-
 
 def gameLoop(): 
     game_over = False
     game_close = False
-
-    x1 = width / 2
-    y1 = height / 2
-
-    x1_change = 0
-    y1_change = 0
-
+    head_position = (width / 2 , height / 2)
+    snake_direction=[-1,0]
     snake_size = 3
-    snake_speed = 10
-    snake_list = []
-
+    snake_speed = 3
+    snake_positions = []
     score = 0
-
-    foodx = round(random.randrange(0, width - snake_size) / 10.0) * 10.0
-    foody = round(random.randrange(0, height - snake_size) / 10.0) * 10.0
+    fruit_x = round(random.randrange(0, width - snake_size) / 20.0) * 20.0
+    fruit_y = round(random.randrange(0, height - snake_size) / 20.0) * 20.0
 
     while not game_over:
-
         while game_close == True:
-            our_snake(snake_size, snake_list)
+            our_snake(snake_size, snake_positions)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -81,64 +59,44 @@ def gameLoop():
             if event.type == pygame.QUIT:
                 game_over = True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    x1_change = -snake_size
-                    y1_change = 0
-                elif event.key == pygame.K_RIGHT:
-                    x1_change = snake_size
-                    y1_change = 0
-                elif event.key == pygame.K_UP:
-                    y1_change = -snake_size
-                    x1_change = 0
-                elif event.key == pygame.K_DOWN:
-                    y1_change = snake_size
-                    x1_change = 0
+                if event.key == pygame.K_LEFT and snake_direction!=[1,0]:
+                    snake_direction=[-1,0]
+                elif event.key == pygame.K_RIGHT and snake_direction!=[-1,0]:
+                    snake_direction=[1,0]
+                elif event.key == pygame.K_UP and snake_direction!=[0,1]:
+                    snake_direction=[0,-1]
+                elif event.key == pygame.K_DOWN and snake_direction!=[0,-1]:
+                    snake_direction=[0,1]
 
-        if x1 >= width or x1 < 0 or y1 >= height or y1 < 0:
+        if head_position[0] >= width or head_position[0] < 0 or head_position[1] >= height or head_position[1] < 0:
             game_close = True
-        x1 += x1_change
-        y1 += y1_change
-        pygame.draw.rect(window, pink, [foodx, foody, snake_size, snake_size])
+        head_position[0] += snake_direction[0]
+        head_position[1] += snake_direction[1]
+        pygame.draw.rect(window, pink, [fruit_x*20, fruit_y*20, snake_size, snake_size])
         snake_head = []
-        snake_head.append(x1)
-        snake_head.append(y1)
-        snake_list.append(snake_head)
-        if len(snake_list) > snake_size:
-            del snake_list[0]
+        snake_head.append(head_position[0])
+        snake_head.append(head_position[1])
+        snake_positions.append(snake_head)
+        if len(snake_positions) > snake_size:
+            del snake_positions[0]
 
-        for x in snake_list[:-1]:
+        for x in snake_positions[:-1]:
             if x == snake_head:
                 game_close = True
 
-        our_snake(snake_size, snake_list)
+        our_snake(snake_size, snake_positions)
 
         pygame.display.update()
 
-        if x1 == foodx and y1 == foody:
-            foodx = round(random.randrange(0, width - snake_size) / 10.0) * 10.0
-            foody = round(random.randrange(0, height - snake_size) / 10.0) * 10.0
+        if head_position[0] == fruit_x and head_position[1] == fruit_y:
+            fruit_x = round(random.randrange(0, width - snake_size) / 10.0) * 10.0
+            fruit_y = round(random.randrange(0, height - snake_size) / 10.0) * 10.0
             snake_size += 1
             score +=1
             pygame.display.set_caption('Score du Snake = ',score)
             snake_speed = snake_speed + 1
-        
-
-
         clock.tick(snake_speed)
-
-        
 
     pygame.quit()
     quit()
-
-
 gameLoop()
-
-
-
-
-
-
-
-
-
